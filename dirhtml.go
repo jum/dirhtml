@@ -27,6 +27,7 @@ var (
 <html>
 <head>
    <title>{{.Title}}</title>
+   <meta name=color-scheme content="light dark">
 </head>
 <body>
 	<table border="1" cellpadding="5">
