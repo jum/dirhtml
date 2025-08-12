@@ -109,6 +109,8 @@ func main() {
 				data.IndexText = string(b)
 			}
 			f.Close()
+		} else {
+			data.IndexText = ""
 		}
 		debug("data %#v\n", data)
 		index, err := os.Create(filepath.Join(absDir, "index.html"))
