@@ -10,8 +10,11 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
+	"io"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 )
 
 var (
@@ -51,6 +54,11 @@ var (
 		{{end}}
 	{{end}}
 	</table>
+	{{if .IndexText}}
+	<pre>
+{{.IndexText}}
+	</pre>
+	{{end}}
 </body>
 </html>
 `))
@@ -66,10 +74,10 @@ func debug(format string, a ...interface{}) {
 
 func main() {
 	var (
-		//err error
 		data struct {
-			Title string
-			Files []os.FileInfo
+			Title     string
+			Files     []os.FileInfo
+			IndexText string
 		}
 	)
 	flag.Parse()
@@ -82,13 +90,25 @@ func main() {
 		debug("absDir %#v\n", absDir)
 		data.Title = filepath.Base(absDir)
 		f, err := os.Open(absDir)
-		defer f.Close()
 		if err != nil {
 			panic(err.Error())
 		}
+		defer f.Close()
 		data.Files, err = f.Readdir(0)
+		slices.SortFunc(data.Files, func(a, b os.FileInfo) int {
+			return strings.Compare(a.Name(), b.Name())
+		})
 		if err != nil {
 			panic(err.Error())
+		}
+		f.Close()
+		f, err = os.Open(filepath.Join(absDir, "index.txt"))
+		if err == nil {
+			b, err := io.ReadAll(f)
+			if err == nil {
+				data.IndexText = string(b)
+			}
+			f.Close()
 		}
 		debug("data %#v\n", data)
 		index, err := os.Create(filepath.Join(absDir, "index.html"))
