@@ -30,6 +30,7 @@ var (
 <html>
 <head>
    <title>{{.Title}}</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1" />
    <meta name=color-scheme content="light dark">
 </head>
 <body>
